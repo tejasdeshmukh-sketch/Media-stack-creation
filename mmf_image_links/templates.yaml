@@ -1,0 +1,116 @@
+# Media stack definitions.
+#
+# Each entry describes how the pivoted image links should be laid out for one
+# destination. Edit the header strings here to match your own channel templates
+# -- nothing in the code hardcodes a marketplace.
+#
+# shape:
+#   wide   -> one column per image  (main_header + other_header repeated)
+#   joined -> main image in its own column, the rest joined into a single cell
+#   long   -> one ROW per image (Shopify-style), not one column
+#
+# max_images counts the main image. null / omitted means unlimited.
+# on_overflow: "truncate" drops extras, "warn" keeps them and flags the SKU.
+#
+# other_header is a format string with two available tokens:
+#   {n}    1-based index among the NON-main images  (1 -> other_image_url1)
+#   {slot} 1-based index among ALL images           (2 -> Image 2)
+# Format specs work, so "PT{n:02d}" produces PT01, PT02, ...
+
+stacks:
+
+  - key: vba_legacy
+    label: "Legacy (VBA parity)"
+    description: >-
+      Identical to the original MMF_ImageLinks_By_SKU_Sequence macro output:
+      unlimited columns, no cap, no renaming.
+    shape: wide
+    sku_header: "Master Id/ Sku"
+    main_header: "Main Image"
+    other_header: "Other Image {n}"
+    max_images: null
+    on_overflow: warn
+
+  - key: amazon_flatfile
+    label: "Amazon - flat file (main_image_url)"
+    description: >-
+      Amazon category listing template column names. Nine images total:
+      one main plus eight PT slots.
+    shape: wide
+    sku_header: "item_sku"
+    main_header: "main_image_url"
+    other_header: "other_image_url{n}"
+    max_images: 9
+    on_overflow: truncate
+
+  - key: amazon_pt
+    label: "Amazon - PT naming (MAIN / PT01-PT08)"
+    description: >-
+      The variant of the Amazon template that labels slots MAIN and PT01..PT08.
+    shape: wide
+    sku_header: "SKU"
+    main_header: "MAIN"
+    other_header: "PT{n:02d}"
+    max_images: 9
+    on_overflow: truncate
+
+  - key: walmart
+    label: "Walmart Marketplace"
+    description: >-
+      Walmart's full item spec takes one primary image plus a comma separated
+      list of secondary image URLs.
+    shape: joined
+    sku_header: "SKU"
+    main_header: "Main Image URL"
+    joined_header: "Additional Image URL"
+    delimiter: ","
+    max_images: 9
+    on_overflow: truncate
+
+  - key: shopify
+    label: "Shopify product CSV (one row per image)"
+    description: >-
+      Shopify does not pivot. Each image is its own row sharing the product
+      handle, ordered by Image Position starting at 1.
+    shape: long
+    sku_header: "Handle"
+    url_header: "Image Src"
+    position_header: "Image Position"
+    position_start: 1
+    max_images: 250
+    on_overflow: truncate
+
+  - key: target_plus
+    label: "Target Plus"
+    description: >-
+      Primary image plus alternate image slots.
+    shape: wide
+    sku_header: "SKU"
+    main_header: "Primary Image URL"
+    other_header: "Alternate Image URL {n}"
+    max_images: 9
+    on_overflow: truncate
+
+  - key: ebay
+    label: "eBay (pipe delimited PicURL)"
+    description: >-
+      eBay File Exchange puts every picture in a single PicURL cell separated
+      by pipes, up to 24 images.
+    shape: joined
+    sku_header: "CustomLabel"
+    main_header: null
+    joined_header: "PicURL"
+    delimiter: "|"
+    max_images: 24
+    on_overflow: truncate
+
+  - key: generic_flat
+    label: "Generic flat (Image 1..N)"
+    description: >-
+      No main/other distinction -- just numbered columns. Useful as a PIM feed.
+    shape: wide
+    sku_header: "SKU"
+    main_header: "Image 1"
+    other_header: "Image {slot}"
+    max_images: null
+    on_overflow: warn
