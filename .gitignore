@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# local runs -- keep samples/sample_input.xlsx, ignore everything else
+output_image_links*.xlsx
+image_links_*.xlsx
+image_links_*.csv
+/scratch/
